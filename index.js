@@ -1,14 +1,42 @@
 import express from "express";
 // import { users } from "./data/users.js";
 // import { posts } from "./data/posts.js";
-import usersRouter from './routes/users.js'
+import usersRouter from './routes/users.js'; //export default
+import {error}  from './middlewares/error.js' //named export
 import postsRouter from "./routes/posts.js";
+
 const app = express();
 const PORT = 4000;
 //Middlewares
+
+
+const apiKeys = ["perscholas", "ps-example", "hJAsknw-L198sAJD-l3kasx"];
+
+// New middleware to check for API keys!
+// Note that if the key is not verified,
+// we do not call next(); this is the end.
+// This is why we attached the /api/ prefix
+// to our routing at the beginning!
+app.use("/api", function (req, res, next) {
+  var key = req.query["api-key"];
+
+  // Check for the absence of a key.
+  if (!key) next(error(400, "API Key Required"));
+
+  // Check for key validity.
+  if (apiKeys.indexOf(key) === -1) next(error(401, "Invalid API Key"));
+
+  // Valid key! Store it in req.key for route access.
+  req.key = key;
+  next();
+});
+
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json({ extended: true }));
+
 //New log middleware to help us keep track of requests during testing
+//API-Key middleware
+
 
 //API routes  get by ID
 // app.get("/api/users", (req, res) => {
@@ -104,8 +132,11 @@ app.get("/", (req, res) => {
 
 app.use('/api/posts', postsRouter);
 app.use('/api/users', usersRouter);
-app.use((req, res) => {
-  res.status(404).json({ error: "Middleware Error Resource Not Found" });
-});
+app.use((req, res, next) => {
+  next(error(404, "Middleware Error Resource Not Found") )});
+
+//Error middleware
+app.use((error,req,res,next)=>{res.status(error.status || 500).json({error: error.message})});
+
 
 app.listen(PORT, () => console.log(`Server at ${PORT}`));

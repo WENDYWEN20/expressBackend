@@ -3,7 +3,7 @@ import { posts } from "../data/posts.js";
 
 const postsRouter=Router();
 
-postsRouter.get("/posts", (req, res) => {
+postsRouter.get("/", (req, res) => {
     res.json(posts); // take the posts data imported above
   });
   

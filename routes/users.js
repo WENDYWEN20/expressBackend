@@ -1,9 +1,12 @@
 import {Router} from 'express'
 import {users} from '../data/users.js'
+import {error} from '../middlewares/error.js'
 const usersRouter=Router();
 
 usersRouter.get("/", (req, res) => {
     res.json(users);
+    console.log('apiKey::: ', req.key)
+    console.log(req.query)
   }); //Parse users into json file
   
 usersRouter.get(":id", (req, res, next) => {
@@ -39,7 +42,7 @@ usersRouter.post("/", (req, res) => {
     }
   });
   //patch or update by id
-  usersRouter.patch(':id', (req,res, next)=>{
+usersRouter.patch(":id", (req,res, next)=>{
       console.log(req.params);
       const user=users.find((u,i)=>{
           if (u.id==req.params.id){
@@ -54,7 +57,7 @@ usersRouter.post("/", (req, res) => {
   
   
   //delete by id
-  usersRouter.delete(':id', (req,res, next)=>{
+usersRouter.delete(':id', (req,res, next)=>{
       console.log(req.params)
       const user = users.find((u, i) => {
           if (u.id == req.params.id) {
